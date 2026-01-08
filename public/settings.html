@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - RatoEngine Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">🐀</span>
+                <h1>RatoEngine</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/licenses.html" class="nav-item">
+                    <span class="nav-icon">🔑</span>
+                    <span>Licenças</span>
+                </a>
+                <a href="/youtube.html" class="nav-item">
+                    <span class="nav-icon">🎬</span>
+                    <span>YouTube AI</span>
+                </a>
+                <a href="/settings.html" class="nav-item active">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-ghost btn-full">
+                    <span>🚪</span> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>⚙️ Configurações</h2>
+            </header>
+
+            <div class="content-body">
+                <!-- Account Settings -->
+                <div class="settings-section">
+                    <div class="section-title">👤 Conta Admin</div>
+
+                    <div class="settings-card">
+                        <div class="settings-row">
+                            <div class="settings-info">
+                                <span class="settings-label">Usuário</span>
+                                <span class="settings-value" id="currentUsername">admin</span>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" id="changeUsernameBtn">Alterar</button>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="settings-info">
+                                <span class="settings-label">Senha</span>
+                                <span class="settings-value">••••••••</span>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" id="changePasswordBtn">Alterar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Local AI -->
+                <div class="settings-section">
+                    <div class="section-title">🤖 IA Local (Gratuita)</div>
+
+                    <div class="settings-card">
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🦙 Ollama (LLM Local)</span>
+                                <span class="api-status" id="status-ollama">Verificando...</span>
+                            </div>
+                            <select id="ollamaModel" class="btn btn-ghost btn-sm" style="min-width: 120px;">
+                                <option value="">Carregando...</option>
+                            </select>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🗣️ edge-tts (Vozes Locais)</span>
+                                <span class="api-status" id="status-local-tts">Verificando...</span>
+                            </div>
+                            <select id="ttsVoice" class="btn btn-ghost btn-sm" style="min-width: 150px;">
+                                <option value="">Carregando...</option>
+                            </select>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">📝 Templates (Fallback)</span>
+                                <span class="api-status configured">✅ Sempre disponível</span>
+                            </div>
+                            <span class="badge badge-lifetime">Offline</span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 16px; padding: 16px; background: var(--bg-tertiary); border: 1px solid var(--border-default); border-radius: var(--radius-md);">
+                        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                            <strong>Prioridade:</strong> 1️⃣ Ollama → 2️⃣ APIs pagas → 3️⃣ Templates
+                        </p>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                            <button id="installDepsBtn" class="btn btn-ghost btn-sm">
+                                <span>📥</span> Instalar (1ª vez)
+                            </button>
+                            <button id="startServicesBtn" class="btn btn-primary btn-sm">
+                                <span>▶️</span> INICIAR SERVIÇOS
+                            </button>
+                            <button id="stopServicesBtn" class="btn btn-danger btn-sm"
+                                style="background-color: #dc3545; color: white;">
+                                <span>⏹️</span> PARAR SERVIÇOS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Keys -->
+                <div class="settings-section">
+                    <div class="section-title">🔐 APIs Externas (Opcionais)</div>
+
+                    <div class="settings-card">
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🤖 OpenAI</span>
+                                <span class="api-status" id="status-openai">Não configurado</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('openai', 'OpenAI')">Configurar</button>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🔍 Google (Gemini)</span>
+                                <span class="api-status" id="status-google">Não configurado</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('google', 'Google')">Configurar</button>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🗣️ ElevenLabs</span>
+                                <span class="api-status" id="status-elevenlabs">Não configurado</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('elevenlabs', 'ElevenLabs')">Configurar</button>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🎥 Veo3</span>
+                                <span class="api-status" id="status-veo3">Não configurado</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('veo3', 'Veo3')">Configurar</button>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🖼️ Pexels (Stock Grátis)</span>
+                                <span class="api-status" id="status-pexels">Não configurado</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('pexels', 'Pexels API')">Configurar</button>
+                        </div>
+
+                        <div class="api-key-row">
+                            <div class="api-info">
+                                <span class="api-name">🎨 Local Stable Diffusion</span>
+                                <span class="api-status" id="status-sd_url">Padrão: 127.0.0.1:7860</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm"
+                                onclick="configureApi('sd_url', 'URL Local SD (Ex: http://127.0.0.1:7860)')">Configurar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Info -->
+                <div class="settings-section">
+                    <div class="section-title">🌐 Servidor</div>
+
+                    <div class="settings-card">
+                        <div class="settings-row">
+                            <div class="settings-info">
+                                <span class="settings-label">URL do Servidor</span>
+                                <span class="settings-value" id="serverUrl">http://localhost:3000</span>
+                            </div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="settings-info">
+                                <span class="settings-label">Endpoint de Validação</span>
+                                <code
+                                    style="font-size: 12px; color: var(--primary-light);">/api/licenses/validate</code>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" onclick="copyEndpoint()">📋 Copiar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Username Modal -->
+    <div class="modal" id="usernameModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Alterar Usuário</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="usernameForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Novo Usuário</label>
+                        <input type="text" id="newUsername" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha Atual</label>
+                        <input type="password" id="usernamePassword" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Alterar Senha</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="passwordForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Senha Atual</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" id="newPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        <input type="password" id="confirmPassword" required minlength="6">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- API Modal -->
+    <div class="modal" id="apiModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="apiModalTitle">Configurar API</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="apiForm">
+                <input type="hidden" id="apiService">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Chave de API</label>
+                        <input type="password" id="apiKey" required placeholder="sk-...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="removeApiBtn">Remover</button>
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        App.requireAuth();
+
+        // Get current user
+        API.get('/auth/me').then(data => {
+            document.getElementById('currentUsername').textContent = data.user?.username || 'admin';
+        });
+
+        // Setup modals
+        function setupModal(id) {
+            const modal = document.getElementById(id);
+            modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-cancel')?.addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-overlay').addEventListener('click', () => modal.classList.remove('open'));
+        }
+        setupModal('usernameModal');
+        setupModal('passwordModal');
+        setupModal('apiModal');
+
+        // Load API status
+        async function loadApiStatus() {
+            try {
+                const { status } = await API.get('/youtube/api-status');
+                Object.entries(status || {}).forEach(([service, configured]) => {
+                    const el = document.getElementById(`status-${service}`);
+                    if (el) {
+                        el.textContent = configured ? '✅ Configurado' : 'Não configurado';
+                        el.className = 'api-status ' + (configured ? 'configured' : '');
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Load Local AI status
+        async function loadLocalAIStatus() {
+            try {
+                const status = await API.get('/youtube/ai-status');
+
+                // Ollama
+                const ollamaEl = document.getElementById('status-ollama');
+                const ollamaSelect = document.getElementById('ollamaModel');
+                if (status.local?.ollama) {
+                    ollamaEl.textContent = '✅ Rodando';
+                    ollamaEl.className = 'api-status configured';
+                    ollamaSelect.innerHTML = (status.local.ollamaModels || []).map(m =>
+                        `<option value="${m}">${m}</option>`
+                    ).join('') || '<option>Nenhum modelo</option>';
+                } else {
+                    ollamaEl.textContent = '❌ Não rodando';
+                    ollamaEl.className = 'api-status';
+                    ollamaSelect.innerHTML = '<option>Instale Ollama</option>';
+                }
+
+                // TTS
+                const ttsEl = document.getElementById('status-local-tts');
+                const ttsSelect = document.getElementById('ttsVoice');
+                if (status.local?.tts) {
+                    ttsEl.textContent = '✅ Disponível';
+                    ttsEl.className = 'api-status configured';
+                    ttsSelect.innerHTML = (status.local.ttsVoices || []).map(v =>
+                        `<option value="${v.id}">${v.name}</option>`
+                    ).join('') || '<option>Nenhuma voz</option>';
+                } else {
+                    ttsEl.textContent = '⚠️ pip install edge-tts';
+                    ttsEl.className = 'api-status';
+                    ttsSelect.innerHTML = '<option>Instale edge-tts</option>';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Change username
+        document.getElementById('changeUsernameBtn').addEventListener('click', () => {
+            document.getElementById('usernameModal').classList.add('open');
+        });
+
+        document.getElementById('usernameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.put('/auth/username', {
+                    newUsername: document.getElementById('newUsername').value,
+                    password: document.getElementById('usernamePassword').value
+                });
+                document.getElementById('usernameModal').classList.remove('open');
+                document.getElementById('currentUsername').textContent = document.getElementById('newUsername').value;
+                App.showToast('Usuário alterado!', 'success');
+            } catch (error) {
+                App.showToast(error.message || 'Erro', 'error');
+            }
+        });
+
+        // Change password
+        document.getElementById('changePasswordBtn').addEventListener('click', () => {
+            document.getElementById('passwordModal').classList.add('open');
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (document.getElementById('newPassword').value !== document.getElementById('confirmPassword').value) {
+                App.showToast('Senhas não coincidem', 'error');
+                return;
+            }
+            try {
+                await API.put('/auth/password', {
+                    currentPassword: document.getElementById('currentPassword').value,
+                    newPassword: document.getElementById('newPassword').value
+                });
+                document.getElementById('passwordModal').classList.remove('open');
+                e.target.reset();
+                App.showToast('Senha alterada!', 'success');
+            } catch (error) {
+                App.showToast(error.message || 'Erro', 'error');
+            }
+        });
+
+        // Configure API
+        window.configureApi = (service, name) => {
+            document.getElementById('apiModalTitle').textContent = `Configurar ${name}`;
+            document.getElementById('apiService').value = service;
+            document.getElementById('apiKey').value = '';
+            document.getElementById('apiModal').classList.add('open');
+        };
+
+        document.getElementById('apiForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('/settings/api-keys', {
+                    service: document.getElementById('apiService').value,
+                    apiKey: document.getElementById('apiKey').value
+                });
+                document.getElementById('apiModal').classList.remove('open');
+                loadApiStatus();
+                App.showToast('API configurada!', 'success');
+            } catch (error) {
+                App.showToast('Erro', 'error');
+            }
+        });
+
+        document.getElementById('removeApiBtn').addEventListener('click', async () => {
+            if (confirm('Remover esta API?')) {
+                await API.delete(`/settings/api-keys/${document.getElementById('apiService').value}`);
+                document.getElementById('apiModal').classList.remove('open');
+                loadApiStatus();
+                App.showToast('API removida', 'success');
+            }
+        });
+
+        // Copy endpoint
+        window.copyEndpoint = () => {
+            navigator.clipboard.writeText(window.location.origin + '/api/licenses/validate');
+            App.showToast('Endpoint copiado!', 'success');
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.logout();
+            window.location.href = '/';
+        });
+
+        loadApiStatus();
+        loadLocalAIStatus();
+        document.getElementById('serverUrl').textContent = window.location.origin;
+
+        // Install dependencies button
+        document.getElementById('installDepsBtn').addEventListener('click', async () => {
+            if (!confirm('Isso vai rodar o script de instalação (Ollama, Python, etc) no servidor. Continuar?')) return;
+
+            const btn = document.getElementById('installDepsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Instalando...';
+
+            try {
+                const res = await API.post('/system/install-dependencies', {});
+                App.showToast(res.message, 'success');
+            } catch (e) {
+                App.showToast('Erro ao iniciar instalação: ' + e.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<span>📥</span> Instalar (1ª vez)';
+            }
+        });
+
+        // Start Services button
+        document.getElementById('startServicesBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('startServicesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Iniciando...';
+
+            try {
+                const res = await API.post('/system/start-services', {});
+                App.showToast(res.message, 'success');
+                // Wait a bit then refresh status
+                setTimeout(loadLocalAIStatus, 5000);
+            } catch (e) {
+                App.showToast('Erro ao iniciar serviços: ' + e.message, 'error');
+            }
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span>▶️</span> INICIAR SERVIÇOS';
+            }, 3000);
+        });
+
+        // Stop Services button
+        document.getElementById('stopServicesBtn').addEventListener('click', async () => {
+            if (!confirm('Isso vai encerrar o processo do Ollama. Tem certeza?')) return;
+
+            const btn = document.getElementById('stopServicesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Parando...';
+
+            try {
+                const res = await API.post('/system/stop-services', {});
+                App.showToast(res.message, 'success');
+                setTimeout(loadLocalAIStatus, 2000);
+            } catch (e) {
+                App.showToast('Erro ao parar: ' + e.message, 'error');
+            }
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span>⏹️</span> PARAR SERVIÇOS';
+            }, 2000);
+        });
+    </script>
+</body>
+
+</html>

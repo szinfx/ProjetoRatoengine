@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - RatoEngine Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">🐀</span>
+                <h1>RatoEngine</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/licenses.html" class="nav-item">
+                    <span class="nav-icon">🔑</span>
+                    <span>Licenças</span>
+                </a>
+                <a href="/youtube.html" class="nav-item">
+                    <span class="nav-icon">🎬</span>
+                    <span>YouTube AI</span>
+                </a>
+                <a href="/settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-ghost btn-full">
+                    <span>🚪</span> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>Olá, <span id="adminName">Admin</span>! 👋</h2>
+                <p class="greeting">Bem-vindo ao painel de controle.</p>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">🔑</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total de Licenças</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statActive">0</div>
+                        <div class="stat-label">Licenças Ativas</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statExpiring">0</div>
+                        <div class="stat-label">Expirando em 30 dias</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon red">❌</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statRevoked">0</div>
+                        <div class="stat-label">Revogadas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Status -->
+            <div class="section-title">Status dos Serviços</div>
+            <div class="api-status-grid" id="apiStatusGrid">
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-ollama"></div>
+                    <span>Ollama (Local)</span>
+                </div>
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-tts"></div>
+                    <span>edge-tts (Local)</span>
+                </div>
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-openai"></div>
+                    <span>OpenAI</span>
+                </div>
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-google"></div>
+                    <span>Google</span>
+                </div>
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-elevenlabs"></div>
+                    <span>ElevenLabs</span>
+                </div>
+                <div class="api-status-item">
+                    <div class="status-dot inactive" id="dot-veo3"></div>
+                    <span>Veo3</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="/licenses.html" class="btn btn-primary">
+                    <span>➕</span> Nova Licença
+                </a>
+                <a href="/youtube.html" class="btn btn-secondary">
+                    <span>🎬</span> Criar Vídeo
+                </a>
+                <a href="/settings.html" class="btn btn-ghost">
+                    <span>⚙️</span> Configurações
+                </a>
+            </div>
+
+            <!-- Recent Licenses -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🕐 Últimas Licenças</h3>
+                    <a href="/licenses.html" class="btn btn-ghost btn-sm">Ver todas</a>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Plano</th>
+                                <th>Status</th>
+                                <th>Máquinas</th>
+                                <th>Expira em</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentLicenses">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted" style="padding: 40px;">
+                                    Carregando...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        App.requireAuth();
+
+        // Get admin name
+        API.get('/auth/me').then(data => {
+            if (data.user) {
+                document.getElementById('adminName').textContent = data.user.username;
+            }
+        });
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const { stats } = await API.get('/licenses/stats');
+                document.getElementById('statTotal').textContent = stats.total || 0;
+                document.getElementById('statActive').textContent = stats.active || 0;
+                document.getElementById('statExpiring').textContent = stats.expiring_soon || 0;
+                document.getElementById('statRevoked').textContent = stats.revoked || 0;
+            } catch (e) {
+                console.error('Error loading stats:', e);
+            }
+        }
+
+        // Load API status
+        async function loadApiStatus() {
+            try {
+                const status = await API.get('/youtube/ai-status');
+
+                // Local services
+                updateDot('ollama', status.local?.ollama);
+                updateDot('tts', status.local?.tts);
+
+                // API services
+                updateDot('openai', status.api?.openai);
+                updateDot('google', status.api?.google);
+                updateDot('elevenlabs', status.api?.elevenlabs);
+                updateDot('veo3', status.api?.veo3);
+            } catch (e) {
+                console.error('Error loading API status:', e);
+            }
+        }
+
+        function updateDot(id, active) {
+            const dot = document.getElementById(`dot-${id}`);
+            if (dot) {
+                dot.className = `status-dot ${active ? 'active' : 'inactive'}`;
+            }
+        }
+
+        // Load recent licenses
+        async function loadRecentLicenses() {
+            try {
+                const { licenses } = await API.get('/licenses');
+                const tbody = document.getElementById('recentLicenses');
+
+                if (!licenses || licenses.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted" style="padding: 40px;">
+                                Nenhuma licença criada ainda
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const recent = licenses.slice(0, 5);
+                tbody.innerHTML = recent.map(license => {
+                    const planBadge = {
+                        monthly: 'badge-monthly',
+                        annual: 'badge-annual',
+                        lifetime: 'badge-lifetime'
+                    }[license.plan] || 'badge-monthly';
+
+                    const planText = {
+                        monthly: 'Mensal',
+                        annual: 'Anual',
+                        lifetime: 'Vitalício'
+                    }[license.plan] || license.plan;
+
+                    const statusBadge = {
+                        active: 'badge-active',
+                        expired: 'badge-expired',
+                        revoked: 'badge-revoked'
+                    }[license.status] || 'badge-active';
+
+                    const statusText = {
+                        active: 'Ativo',
+                        expired: 'Expirado',
+                        revoked: 'Revogado'
+                    }[license.status] || license.status;
+
+                    const maskedKey = license.key.substring(0, 9) + '...' + license.key.substring(license.key.length - 4);
+                    const expiresAt = license.expires_at ? new Date(license.expires_at).toLocaleDateString('pt-BR') : 'Nunca';
+
+                    return `
+                        <tr>
+                            <td><code style="font-size: 12px; color: var(--primary-light);">${maskedKey}</code></td>
+                            <td><span class="badge ${planBadge}">${planText}</span></td>
+                            <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                            <td>${license.machines_used || 0}/${license.max_machines}</td>
+                            <td>${expiresAt}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Error loading licenses:', e);
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.logout();
+            window.location.href = '/';
+        });
+
+        // Init
+        loadStats();
+        loadApiStatus();
+        loadRecentLicenses();
+    </script>
+</body>
+
+</html>

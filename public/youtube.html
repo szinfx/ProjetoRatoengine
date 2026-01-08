@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI - RatoEngine Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <style>
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .idea-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            transition: all var(--transition-normal);
+        }
+
+        .idea-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .idea-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .idea-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .idea-potential {
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .potential-high {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .potential-medium {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .potential-low {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .script-preview {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .channel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .channel-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .channel-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .channel-niche {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Premium Slider Styles */
+        .ideas-slider-container {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.05) 100%);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ideas-slider-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.5), transparent);
+        }
+
+        .ideas-slider-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .ideas-slider-label span {
+            font-size: 16px;
+        }
+
+        .ideas-slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ideas-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 8px;
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0.4));
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .ideas-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            border: 3px solid #fff;
+        }
+
+        .ideas-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.7), 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .ideas-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 3px solid #fff;
+        }
+
+        .ideas-count-display {
+            min-width: 60px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .ideas-range-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">🐀</span>
+                <h1>RatoEngine</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/licenses.html" class="nav-item">
+                    <span class="nav-icon">🔑</span>
+                    <span>Licenças</span>
+                </a>
+                <a href="/youtube.html" class="nav-item active">
+                    <span class="nav-icon">🎬</span>
+                    <span>YouTube AI</span>
+                </a>
+                <a href="/settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-ghost btn-full">
+                    <span>🚪</span> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h2>🎬 YouTube AI Studio</h2>
+            </header>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('research')">🔬 Pesquisa</button>
+                <button class="tab-btn" onclick="switchTab('channels')">📺 Canais</button>
+                <button class="tab-btn" onclick="switchTab('videos')">🎥 Vídeos</button>
+            </div>
+
+            <!-- Research Tab -->
+            <div id="tab-research" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔍 Pesquisa de Nicho e Ideias</h3>
+                    </div>
+                    <div class="card-body">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>🎯 Nicho *</label>
+                                <input type="text" id="researchNiche"
+                                    placeholder="Ex: finanças pessoais, culinária fit, games...">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>🔑 Palavras-chave (opcional)</label>
+                                <input type="text" id="researchKeywords"
+                                    placeholder="Ex: iniciantes, dinheiro rápido...">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>🤖 Provedor de IA</label>
+                                <select id="aiProvider" class="form-control" style="background: #333; color: white;">
+                                    <option value="ollama" selected>🦙 Ollama (Local)</option>
+                                    <option value="google">✨ Gemini (Google AI)</option>
+                                    <option value="openai">🧠 GPT-4 (OpenAI)</option>
+                                </select>
+                            </div>
+                            <div class="ideas-slider-container">
+                                <div class="ideas-slider-label">
+                                    <span>📊</span> Quantidade de Ideias
+                                </div>
+                                <div class="ideas-slider-wrapper">
+                                    <input type="range" id="ideasCount" min="1" max="50" value="10" class="ideas-slider"
+                                        oninput="document.getElementById('ideasCountDisplay').textContent = this.value">
+                                    <div id="ideasCountDisplay" class="ideas-count-display">10</div>
+                                </div>
+                                <div class="ideas-range-labels">
+                                    <span>1</span>
+                                    <span>Arraste para escolher</span>
+                                    <span>50</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reference Videos Section -->
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label>🎬 Vídeos de Referência (opcional)</label>
+                            <textarea id="referenceVideos" rows="2"
+                                placeholder="Cole links de vídeos do YouTube que você gosta do estilo (um por linha)"
+                                style="font-size: 13px;"></textarea>
+                            <small style="color: var(--text-muted); font-size: 11px;">
+                                💡 A IA vai analisar o título e estilo desses vídeos para gerar ideias similares
+                            </small>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                            <button class="btn btn-primary" onclick="doResearch()" id="researchBtn">
+                                <span>🚀</span> Gerar Ideias
+                            </button>
+                            <span style="color: var(--text-muted); font-size: 12px;">
+                                Powered by Multi-Agent AI System 🤖
+                            </span>
+                        </div>
+
+                        <div id="researchResults" class="ideas-grid" style="display: none;"></div>
+
+                        <div id="researchEmpty" class="empty-state" style="margin-top: 40px;">
+                            <div class="icon">💡</div>
+                            <h4>Pesquise ideias de vídeos</h4>
+                            <p>Digite um nicho, escolha a quantidade e clique para gerar ideias com IA.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channels Tab -->
+            <div id="tab-channels" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px;">Seus Canais</h3>
+                    <button class="btn btn-primary" onclick="openChannelModal()">
+                        <span>➕</span> Novo Canal
+                    </button>
+                </div>
+
+                <div id="channelsGrid" class="channel-grid">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">📺</div>
+                        <h4>Nenhum canal cadastrado</h4>
+                        <p>Adicione seu primeiro canal para começar.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Videos Tab -->
+            <div id="tab-videos" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px;">Vídeos em Produção</h3>
+                    <button class="btn btn-primary" onclick="openVideoModal()">
+                        <span>➕</span> Novo Vídeo
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Canal</th>
+                                    <th>Plataforma</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="videosTable">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted" style="padding: 60px;">
+                                        Nenhum vídeo em produção
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Modal Updated -->
+    <div class="modal" id="scriptModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>📝 Gerar e Produzir</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+
+            <div id="scriptStep1">
+                <form id="scriptForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Ideia do Vídeo</label>
+                            <textarea id="scriptIdea" rows="3" placeholder="Descreva a ideia do vídeo..."
+                                required></textarea>
+                            <input type="hidden" id="scriptPlatform" value="youtube">
+                        </div>
+                        <div class="form-group">
+                            <div style="display: flex; gap: 10px;">
+                                <select id="scriptStyle" class="form-control">
+                                    <option value="informative">Informativo</option>
+                                    <option value="entertainment">Entretenimento</option>
+                                    <option value="tutorial">Tutorial</option>
+                                    <option value="storytelling">Storytelling</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary" id="generateScriptBtn">
+                                    <span>✨</span> Gerar Roteiro
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="generatedScript" style="display: none; margin-top: 20px;">
+                            <label>Roteiro Gerado:</label>
+                            <div id="scriptPreview" class="script-preview" contenteditable="true"
+                                style="background: #1e1e1e; padding: 15px; border-radius: 8px; max-height: 250px; overflow-y: auto; font-family: monospace; white-space: pre-wrap;">
+                            </div>
+
+                            <!-- Autopilot Controls -->
+                            <div
+                                style="margin-top: 20px; background: #2a2a2a; padding: 15px; border-radius: 8px; border: 1px solid #444;">
+                                <h4 style="margin-top: 0; color: #fff;">🎬 Piloto Automático (Local & Online)</h4>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+                                    <!-- 1. SamurAIGPT (Smart Director) - Was 'local_stock' -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #333; padding: 10px; border-radius: 6px; border: 1px solid #FF5722;">
+                                        <input type="radio" name="autopilotMode" value="agent_samurai" checked>
+                                        <div>
+                                            <strong style="display: block; color: #FF5722;">🥷 SamurAI GPT
+                                                (Agent)</strong>
+                                            <span style="font-size: 11px; color: #ccc;">Edição Inteligente com Stock
+                                                (Pexels) + Efeitos</span>
+                                        </div>
+                                    </label>
+
+                                    <!-- 2. Generative Creator (Open-Sora) -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #9C27B0;">
+                                        <input type="radio" name="autopilotMode" value="agent_opensora">
+                                        <div>
+                                            <strong style="display: block; color: #E040FB;">✨ Open-Sora /
+                                                Hunyuan</strong>
+                                            <span style="font-size: 11px; color: #aaa;">Geração de Vídeo via IA (Requer
+                                                GPU/Python)</span>
+                                        </div>
+                                    </label>
+
+                                    <!-- 3. Agentic Editor (Director/UniVA) -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #00BCD4;">
+                                        <input type="radio" name="autopilotMode" value="agent_director">
+                                        <div>
+                                            <strong style="display: block; color: #00E5FF;">🎬 Director AI
+                                                Agent</strong>
+                                            <span style="font-size: 11px; color: #aaa;">Agente de Edição Complexa
+                                                (Director/UniVA)</span>
+                                        </div>
+                                    </label>
+
+                                    <!-- LOCAL: VISUALIZER -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #333; padding: 10px; border-radius: 6px;">
+                                        <input type="radio" name="autopilotMode" value="local_visualizer">
+                                        <div>
+                                            <strong style="display: block; color: #4CAF50;">🎵 Modo Visualizer</strong>
+                                            <span style="font-size: 11px; color: #aaa;">Onda Sonora Simples
+                                                (Podcast)</span>
+                                        </div>
+                                    </label>
+
+                                    <!-- AGENT CLOUD (NOVO) -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #FFC107;">
+                                        <input type="radio" name="autopilotMode" value="agent_cloud">
+                                        <div>
+                                            <strong style="display: block; color: #FFC107;">☁️ Agent Cloud
+                                                (Externo)</strong>
+                                            <span style="font-size: 11px; color: #aaa;">Usa logins externos
+                                                (OpenAI/Runway) para editar</span>
+                                        </div>
+                                    </label>
+
+                                    <!-- AGENT VEO (Google) -->
+                                    <label
+                                        style="display: flex; gap: 8px; cursor: pointer; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #4285F4;">
+                                        <input type="radio" name="autopilotMode" value="agent_veo">
+                                        <div>
+                                            <strong style="display: block; color: #4285F4;">🎥 Google Veo (Vertex
+                                                AI)</strong>
+                                            <span style="font-size: 11px; color: #aaa;">Geração de vídeo realista
+                                                (Requer Cloud Key)</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                    <button type="button" class="btn" style="background: #444;"
+                                        onclick="window.saveDraftOnly()">
+                                        💾 Rascunho
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="window.runAutopilot()">
+                                        <span>🚀</span> Gerar Vídeo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Progress Screen -->
+            <div id="autopilotProgress" style="display: none; padding: 40px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 20px;">⚙️</div>
+                <h3>Produzindo seu Vídeo...</h3>
+                <p id="progressStatus">Iniciando tarefas...</p>
+                <div class="progress-bar"
+                    style="width: 100%; height: 10px; background: #444; border-radius: 5px; margin-top: 20px; overflow: hidden;">
+                    <div id="progressBarFill"
+                        style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.5s;">
+                    </div>
+                </div>
+                <p style="margin-top: 10px; font-size: 12px; color: #aaa;">Isso pode levar alguns minutos. Não feche
+                    esta
+                    janela.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal (Was Missing) -->
+    <div class="modal" id="videoModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎬 Novo Vídeo</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="videoForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Título do Vídeo</label>
+                        <input type="text" id="videoTitle" required placeholder="Ex: Como ganhar dinheiro...">
+                    </div>
+                    <div class="form-group">
+                        <label>Canal</label>
+                        <select id="videoChannelId" required>
+                            <option value="">Selecione um canal...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Plataforma</label>
+                        <select id="videoPlatform">
+                            <option value="youtube">YouTube (Horizontal)</option>
+                            <option value="shorts">Shorts/TikTok (Vertical)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Projeto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Channel Modal (Auth) -->
+    <div class="modal" id="channelModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📺 Conectar Canal</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="channelForm">
+                <div class="modal-body">
+                    <p style="font-size: 12px; margin-bottom: 10px; color: gold;">
+                        ⚠️ Para upload automático, você precisa de credenciais do Google Cloud Console.
+                    </p>
+                    <div class="form-group">
+                        <label>Nome do Canal (Apelido)</label>
+                        <input type="text" id="channelName" required placeholder="Ex: Meu Canal Games">
+                    </div>
+                    <div style="border-top: 1px solid var(--border-default); margin: 10px 0;"></div>
+                    <div class="form-group">
+                        <label>Google Client ID</label>
+                        <input type="text" id="clientId" placeholder="xxx.apps.googleusercontent.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Google Client Secret</label>
+                        <input type="password" id="clientSecret" placeholder="GOCSPX-xxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Redirect URI</label>
+                        <input type="text" id="redirectUri" value="http://localhost:3000" readonly
+                            style="background: var(--bg-secondary);">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="saveChannelBtn">Salvar e Conectar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Video Gen Modal (Image) -->
+    <div class="modal" id="genVideoModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎬 Montagem de Vídeo</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="genVideoForm">
+                <input type="hidden" id="genVideoId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Imagem de Fundo/Thumbnail</label>
+                        <input type="file" id="videoImage" accept="image/*" required>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-muted)">O sistema vai criar um vídeo estático com esta
+                        imagem e o áudio gerado.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Gerar MP4</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        App.requireAuth();
+
+        // Tab switching
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab.substring(0, 4)));
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        };
+
+        // Setup modals
+        function setupModal(id) {
+            const modal = document.getElementById(id);
+            modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-cancel')?.addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-overlay').addEventListener('click', () => modal.classList.remove('open'));
+        }
+        setupModal('scriptModal');
+        setupModal('channelModal');
+        setupModal('videoModal');
+        setupModal('genVideoModal'); // New modal setup
+
+        // Missing openVideoModal function
+        window.openVideoModal = () => {
+            // Populate channels
+            API.get('/youtube/channels').then(data => {
+                const select = document.getElementById('videoChannelId');
+                select.innerHTML = '<option value="">Selecione um canal...</option>' +
+                    (data.channels || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            });
+            document.getElementById('videoForm').reset();
+            document.getElementById('videoModal').classList.add('open');
+        };
+
+        // Handle Video Creation
+        document.getElementById('videoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await API.post('/youtube/videos', {
+                    title: document.getElementById('videoTitle').value,
+                    channelId: document.getElementById('videoChannelId').value,
+                    platform: document.getElementById('videoPlatform').value
+                });
+                document.getElementById('videoModal').classList.remove('open');
+                App.showToast('Projeto de vídeo criado!', 'success');
+                loadVideos();
+                switchTab('videos');
+            } catch (e) {
+                App.showToast('Erro ao criar vídeo', 'error');
+            }
+        });
+
+        // Research
+        window.doResearch = async () => {
+            const niche = document.getElementById('researchNiche').value.trim();
+            const referenceVideosText = document.getElementById('referenceVideos').value.trim();
+
+            // Allow either niche OR reference videos
+            if (!niche && !referenceVideosText) {
+                App.showToast('Digite um nicho OU cole um link de vídeo de referência', 'error');
+                return;
+            }
+
+            const ideasCount = parseInt(document.getElementById('ideasCount').value) || 10;
+            const btn = document.getElementById('researchBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> Gerando ${ideasCount} ideias com IA...`;
+
+            try {
+                const keywords = document.getElementById('researchKeywords').value;
+                const aiProvider = document.getElementById('aiProvider').value; // Get AI choice
+                const referenceVideos = document.getElementById('referenceVideos').value
+                    .split('\n')
+                    .map(url => url.trim())
+                    .filter(url => url.length > 0 && (url.includes('youtube.com') || url.includes('youtu.be')));
+
+                const result = await API.post('/youtube/research', {
+                    niche,
+                    keywords,
+                    referenceVideos,
+                    count: ideasCount,
+                    aiProvider // Send to backend
+                });
+
+                console.log('Research result:', result);
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro desconhecido na API');
+                }
+
+                // Show all ideas up to the requested count
+                const ideas = (result.ideas || []).slice(0, ideasCount);
+
+                if (ideas.length > 0) {
+                    const container = document.getElementById('researchResults');
+                    container.innerHTML = ideas.map(idea => {
+                        const potentialClass = {
+                            high: 'potential-high',
+                            medium: 'potential-medium',
+                            low: 'potential-low'
+                        }[idea.potential] || 'potential-high';
+
+                        const potentialText = {
+                            high: '🔥 Alto Potencial',
+                            medium: '⚡ Médio',
+                            low: '📊 Baixo'
+                        }[idea.potential] || '🔥 Alto';
+
+                        // Build tags HTML
+                        const tagsHtml = (idea.tags && idea.tags.length > 0)
+                            ? `<div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px;">
+                                ${idea.tags.slice(0, 4).map(t => `<span style="font-size: 10px; padding: 2px 6px; background: var(--bg-tertiary); border-radius: 4px; color: var(--text-muted);">#${t}</span>`).join('')}
+                               </div>`
+                            : '';
+
+                        return `
+                            <div class="idea-card" style="display: flex; flex-direction: column;">
+                                <div class="idea-title" style="font-size: 16px; margin-bottom: 8px;">${idea.title}</div>
+                                
+                                ${idea.hook ? `<div style="font-size: 12px; color: var(--cyan); margin-bottom: 12px; font-style: italic;">"${idea.hook}"</div>` : ''}
+                                
+                                <div class="idea-meta" style="margin-bottom: 12px;">
+                                    <span class="idea-potential ${potentialClass}">${potentialText}</span>
+                                    <span class="badge badge-monthly">${idea.format || 'Vídeo'}</span>
+                                    <span class="text-muted" style="font-size: 11px;">⏱️ ${idea.duration || '8-12 min'}</span>
+                                </div>
+                                
+                                ${idea.target_audience ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">👥 <strong>Público:</strong> ${idea.target_audience}</div>` : ''}
+                                
+                                ${idea.why_viral ? `<div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">🎯 <strong>Por que viraliza:</strong> ${String(idea.why_viral).substring(0, 120)}${String(idea.why_viral).length > 120 ? '...' : ''}</div>` : ''}
+                                
+                                ${idea.thumbnail_idea ? `<div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">🖼️ <strong>Thumbnail:</strong> ${String(idea.thumbnail_idea).substring(0, 80)}${String(idea.thumbnail_idea).length > 80 ? '...' : ''}</div>` : ''}
+                                
+                                ${tagsHtml}
+                                
+                                <div style="margin-top: auto; padding-top: 16px;">
+                                    <button class="btn btn-primary btn-sm btn-full" onclick="openScriptModal('${String(idea.title).replace(/'/g, "\\'")}')">
+                                        <span>📝</span> Gerar Roteiro Completo
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    container.style.display = 'grid';
+                    document.getElementById('researchEmpty').style.display = 'none';
+
+                    App.showToast(`${ideas.length} ideias geradas via ${result.source}!`, 'success');
+                } else {
+                    console.error('No ideas in result:', result);
+                    App.showToast('Nenhuma ideia gerada. Verifique o console (F12).', 'error');
+                }
+            } catch (e) {
+                console.error('Research error:', e);
+                App.showToast('Erro na pesquisa: ' + (e.message || 'Tente novamente'), 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀</span> Gerar 10 Ideias';
+        };
+
+        // Script modal
+        // Script modal
+        window.openScriptModal = (idea = '') => {
+            document.getElementById('scriptIdea').value = idea;
+            document.getElementById('generatedScript').style.display = 'none';
+            // document.getElementById('createVideoFromScriptBtn').style.display = 'none'; // Legacy button removed
+            document.getElementById('scriptModal').classList.add('open');
+        };
+
+        // Window scope function for the Continue button
+        window.createVideoFromScript = async () => {
+            // This function is now just a fallback or legacy. 
+            // The real logic is in runAutopilot and saveDraftOnly.
+            // But we keep it if needed.
+            // Actually, let's just properly implement the new buttons.
+        };
+
+        window.saveDraftOnly = async () => {
+            const script = document.getElementById('scriptPreview').textContent;
+            const title = document.getElementById('scriptIdea').value.substring(0, 50) + "...";
+            const platform = document.getElementById('scriptPlatform').value;
+
+            try {
+                const createRes = await API.post('/youtube/videos', {
+                    title, platform, script, status: 'script_ready'
+                });
+
+                document.getElementById('scriptModal').classList.remove('open');
+                App.showToast('Rascunho salvo com sucesso!', 'success');
+                loadVideos();
+                switchTab('videos');
+            } catch (e) {
+                App.showToast('Erro ao salvar: ' + e.message, 'error');
+            }
+        };
+
+        window.runAutopilot = async () => {
+            const script = document.getElementById('scriptPreview').textContent;
+            const title = document.getElementById('scriptIdea').value.substring(0, 50) + "...";
+            const platform = document.getElementById('scriptPlatform').value;
+            const mode = document.querySelector('input[name="autopilotMode"]:checked').value;
+
+            // UI Feedback
+            document.getElementById('scriptStep1').style.display = 'none';
+            document.getElementById('autopilotProgress').style.display = 'block';
+
+            const updateProgress = (pct, msg) => {
+                document.getElementById('progressBarFill').style.width = pct + '%';
+                document.getElementById('progressStatus').textContent = msg;
+            };
+
+            updateProgress(10, 'Criando projeto...');
+
+            try {
+                // 1. Create Base Video
+                const createRes = await API.post('/youtube/videos', {
+                    title, platform, script, status: 'script_ready'
+                });
+                const videoId = createRes.video.id;
+
+                // 2. Start Autopilot
+                updateProgress(30, mode === 'local_stock' ? 'Diretor de IA planejando cenas...' : 'Iniciando produção...');
+
+                const res = await API.post('/youtube/autopilot', { videoId, mode });
+
+                if (res.videoPath) {
+                    updateProgress(100, 'Vídeo Concluído!');
+                    setTimeout(() => {
+                        document.getElementById('scriptModal').classList.remove('open');
+                        App.showToast('Vídeo criado com sucesso!', 'success');
+                        // Reset UI
+                        document.getElementById('scriptStep1').style.display = 'block';
+                        document.getElementById('autopilotProgress').style.display = 'none';
+                        loadVideos();
+                        switchTab('videos');
+                    }, 1500);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro no Autopilot: ' + (e.message || e));
+                document.getElementById('scriptModal').classList.remove('open');
+                // Reset UI
+                document.getElementById('scriptStep1').style.display = 'block';
+                document.getElementById('autopilotProgress').style.display = 'none';
+            }
+        };
+
+        // Generate script
+        document.getElementById('scriptForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('generateScriptBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Gerando...';
+
+            try {
+                const result = await API.post('/youtube/generate-script', {
+                    idea: document.getElementById('scriptIdea').value,
+                    platform: document.getElementById('scriptPlatform').value,
+                    style: document.getElementById('scriptStyle').value
+                });
+
+                if (result.script) {
+                    document.getElementById('scriptPreview').textContent = result.script;
+                    document.getElementById('generatedScript').style.display = 'block';
+                    // document.getElementById('createVideoFromScriptBtn').style.display = 'block'; // Legacy button removed
+                    App.showToast(`Roteiro gerado! (${result.source})`, 'success');
+                }
+            } catch (e) {
+                App.showToast('Erro ao gerar roteiro', 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>✨</span> Gerar Roteiro';
+        });
+
+        // Channel modal
+        window.openChannelModal = () => {
+            document.getElementById('channelForm').reset();
+            // Clear auth fields as well
+            document.getElementById('clientId').value = '';
+            document.getElementById('clientSecret').value = '';
+            document.getElementById('channelModal').classList.add('open');
+        };
+
+        // Create channel
+        document.getElementById('channelForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('channelName').value;
+            const clientId = document.getElementById('clientId').value;
+            const clientSecret = document.getElementById('clientSecret').value;
+            const redirectUri = document.getElementById('redirectUri').value;
+
+            try {
+                // 1. Create channel in DB first
+                const res = await API.post('/youtube/channels', { name });
+                const channelId = res.channel.id;
+
+                // 2. If creds provided, start OAuth flow
+                if (clientId && clientSecret) {
+                    const authRes = await API.post('/youtube/auth/url', { clientId, clientSecret, redirectUri });
+
+                    // Save pending credentials in localStorage or temp to send with code
+                    const credentials = { clientId, clientSecret, redirectUri };
+                    localStorage.setItem('pendingChannelAuth', JSON.stringify({ channelId, credentials }));
+
+                    // Open popup
+                    const popup = window.open(authRes.url, 'google_auth', 'width=600,height=600');
+
+                    // Poll for code? Or user manually pastes? 
+                    // Let's implement a simple "Paste Code" prompt for manual copy-paste 
+                    // because redirect to localhost:3000 might be intercepted by SPA unless handled carefully.
+                    // Actually, if redirectUri is localhost:3000, it hits the server home page.
+                    // Simplest for "Desktop App" flow is usually "urn:ietf:wg:oauth:2.0:oob" (manual copy paste).
+                    // But if he uses localhost:3000, he needs a route to catch it. 
+                    // Let's ask user to paste the code for robustness (Desktop flow).
+
+                    const code = prompt("O Google vai te dar um código. Cole-o aqui:");
+                    if (code) {
+                        await API.post('/youtube/auth/callback', { code, channelId, credentials });
+                        App.showToast('Canal conectado com sucesso!', 'success');
+                    }
+                } else {
+                    App.showToast('Canal criado (sem conexão automática)', 'success');
+                }
+
+                document.getElementById('channelModal').classList.remove('open');
+                loadChannels();
+            } catch (e) {
+                App.showToast(e.message, 'error');
+            }
+        });
+
+        // Load channels
+        async function loadChannels() {
+            try {
+                const { channels } = await API.get('/youtube/channels');
+                const container = document.getElementById('channelsGrid');
+
+                if (!channels || channels.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="icon">📺</div>
+                            <h4>Nenhum canal cadastrado</h4>
+                            <p>Adicione seu primeiro canal para começar.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = channels.map(c => `
+                    <div class="channel-card">
+                        <div class="channel-icon">📺</div>
+                        <div class="channel-name">${c.name}</div>
+                        <div class="channel-niche">${c.niche || 'Sem nicho definido'}</div>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-ghost btn-sm" onclick="deleteChannel(${c.id})">🗑️ Excluir</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.deleteChannel = async (id) => {
+            if (confirm('Excluir este canal?')) {
+                await API.delete(`/youtube/channels/${id}`);
+                App.showToast('Canal excluído', 'success');
+                loadChannels();
+            }
+        };
+
+        // Load videos
+        async function loadVideos() {
+            try {
+                const { videos } = await API.get('/youtube/videos');
+                const container = document.getElementById('videosTable'); // Changed from tbody to div
+
+                if (!videos || videos.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="icon">🎬</div>
+                            <h4>Nenhum vídeo em produção</h4>
+                            <p>Crie um novo projeto de vídeo para começar.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.className = 'video-grid';
+                // Ensure container is a grid now, not a table-like structure. 
+                // We'll add CSS for .video-grid if not exists, or inline it.
+                container.style.display = 'grid';
+                container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+                container.style.gap = '20px';
+
+                container.innerHTML = videos.map(video => {
+                    const statusMap = {
+                        'draft': { label: 'Rascunho', color: '#666', icon: '📝' },
+                        'script_ready': { label: 'Roteiro OK', color: 'var(--accent-color)', icon: '📄' },
+                        'audio_ready': { label: 'Áudio OK', color: '#ff9800', icon: '🔊' },
+                        'video_ready': { label: 'Vídeo Pronto', color: '#9c27b0', icon: '🎞️' },
+                        'uploaded': { label: 'Publicado', color: '#4CAF50', icon: '🚀' }
+                    };
+
+                    const statusInfo = statusMap[video.status] || { label: video.status, color: '#666', icon: '❓' };
+
+                    let actionBtn = '';
+                    if (video.status === 'script_ready') {
+                        actionBtn = `<button onclick="generateAudio(${video.id})" class="btn btn-sm btn-primary" style="width:100%">🔊 Gerar Áudio</button>`;
+                    } else if (video.status === 'audio_ready') {
+                        actionBtn = `<button onclick="openGenVideoModal(${video.id})" class="btn btn-sm btn-warning" style="width:100%">🎬 Renderizar</button>`;
+                    } else if (video.status === 'video_ready') {
+                        actionBtn = `
+                            <div style="display:flex; gap:8px;">
+                                <a href="videos/video_${video.id}.mp4" target="_blank" class="btn btn-sm" style="flex:1; background:#444; color:white; text-decoration:none; display:flex; align-items:center; justify-content:center;">👁️ Ver</a>
+                                <button onclick="uploadVideo(${video.id})" class="btn btn-sm btn-success" style="flex:1">🚀 Upload</button>
+                            </div>`;
+                    } else if (video.status === 'uploaded') {
+                        actionBtn = `<a href="https://youtu.be/${video.youtube_video_id}" target="_blank" class="btn btn-sm" style="width:100%; background:#d32f2f; color:white">📺 Ver no YouTube</a>`;
+                    }
+
+                    // Thumbnail Logic (Placeholder or actual)
+                    let thumbHtml = `<div style="height:140px; background:linear-gradient(45deg, #1e1e1e, #2a2a2a); display:flex; align-items:center; justify-content:center; border-radius:8px 8px 0 0; position:relative;">
+                        <span style="font-size:40px; opacity:0.2;">🎬</span>
+                        <div style="position:absolute; top:10px; right:10px; background:${statusInfo.color}; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:bold; color:white; display:flex; align-items:center; gap:4px;">
+                            ${statusInfo.icon} ${statusInfo.label}
+                        </div>
+                    </div>`;
+
+                    return `
+                        <div class="video-card" style="background:var(--bg-card); border:1px solid var(--border-default); border-radius:12px; transition:transform 0.2s;">
+                            ${thumbHtml}
+                            <div style="padding:16px;">
+                                <h4 style="margin:0 0 8px 0; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${video.title}">${video.title}</h4>
+                                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:16px; display:flex; justify-content:space-between;">
+                                    <span>📅 ${new Date(video.created_at).toLocaleDateString()}</span>
+                                    <span>${video.channel_name || '👤 Sem canal'}</span>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:8px;">
+                                    ${actionBtn}
+                                    <button onclick="deleteVideo(${video.id})" class="btn btn-sm btn-ghost" style="color:var(--text-muted); font-size:11px;">🗑️ Excluir Projeto</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- ACTIONS ---
+        async function generateAudio(id) {
+            if (!confirm('Gerar áudio para este vídeo?')) return;
+            try {
+                App.showToast('Gerando áudio (pode demorar)...');
+                await API.post('/youtube/generate-audio', { videoId: id, forceLocal: true }); // Defaulting to local first
+                App.showToast('Áudio gerado!', 'success');
+                loadVideos();
+            } catch (e) { App.showToast(e.message, 'error'); }
+        }
+
+        window.openGenVideoModal = (id) => {
+            document.getElementById('genVideoId').value = id;
+            document.getElementById('genVideoModal').classList.add('open');
+        }
+
+        async function uploadVideo(id) {
+            if (!confirm('Fazer upload para o YouTube?')) return;
+            try {
+                App.showToast('Enviando para o YouTube...');
+                const res = await API.post('/youtube/upload-video', { videoId: id });
+                App.showToast('Vídeo enviado! ID: ' + res.youtubeId, 'success');
+                loadVideos();
+            } catch (e) { App.showToast(e.message, 'error'); }
+        }
+
+        document.getElementById('genVideoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('genVideoId').value;
+            const file = document.getElementById('videoImage').files[0];
+
+            if (!file) {
+                App.showToast('Por favor, selecione uma imagem.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('videoId', id);
+            formData.append('image', file);
+
+            try {
+                // Manually fetch for FormData
+                const btn = e.target.querySelector('button[type="submit"]'); // Target the submit button
+                btn.disabled = true;
+                btn.innerText = 'Renderizando...';
+
+                const res = await fetch('/api/youtube/generate-video', {
+                    method: 'POST',
+                    body: formData // No headers, browser sets boundary
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || 'Erro desconhecido ao gerar vídeo.');
+                }
+
+                App.showToast('Vídeo renderizado com sucesso!', 'success');
+                document.getElementById('genVideoModal').classList.remove('open');
+                loadVideos();
+            } catch (e) {
+                App.showToast(e.message, 'error');
+            } finally {
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.disabled = false;
+                btn.innerText = 'Gerar MP4';
+            }
+        });
+
+        window.deleteVideo = async (id) => {
+            if (confirm('Excluir este vídeo?')) {
+                await API.delete(`/youtube/videos/${id}`);
+                App.showToast('Vídeo excluído', 'success');
+                loadVideos();
+            }
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.logout();
+            window.location.href = '/';
+        });
+
+        // Init
+        loadChannels();
+        loadVideos();
+    </script>
+</body>
+
+</html>

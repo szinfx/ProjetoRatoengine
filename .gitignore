@@ -1,0 +1,29 @@
+# Arquivos grandes (> 100MB)
+dist_server.zip
+models/huggingface/hub/models--stabilityai--sd-vae-ft-ema/snapshots/*/diffusion_pytorch_model.safetensors
+
+# Outros arquivos grandes de modelos
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.ckpt
+
+# Node modules (serão reinstalados)
+node_modules/
+
+# Uploads temporários
+public/uploads/audio/*.mp3
+public/uploads/video/*
+
+# Database local
+database/*.db
+
+# Logs
+*.log
+logs/
+
+# Caches
+.cache/
+__pycache__/

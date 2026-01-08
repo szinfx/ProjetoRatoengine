@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licenças - RatoEngine Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">🐀</span>
+                <h1>RatoEngine</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/licenses.html" class="nav-item active">
+                    <span class="nav-icon">🔑</span>
+                    <span>Licenças</span>
+                </a>
+                <a href="/youtube.html" class="nav-item">
+                    <span class="nav-icon">🎬</span>
+                    <span>YouTube AI</span>
+                </a>
+                <a href="/settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-ghost btn-full">
+                    <span>🚪</span> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>🔑 Gerenciar Licenças</h2>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <span>➕</span> Nova Licença
+                </button>
+            </header>
+
+            <!-- Filters -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-body" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="searchInput" placeholder="🔍 Buscar por key ou email..."
+                            style="width: 100%; padding: 10px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 14px;">
+                    </div>
+                    <select id="filterStatus"
+                        style="padding: 10px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 14px;">
+                        <option value="">Todos os Status</option>
+                        <option value="active">Ativas</option>
+                        <option value="expired">Expiradas</option>
+                        <option value="revoked">Revogadas</option>
+                    </select>
+                    <select id="filterPlan"
+                        style="padding: 10px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-default); border-radius: var(--radius-md); color: var(--text-primary); font-size: 14px;">
+                        <option value="">Todos os Planos</option>
+                        <option value="monthly">Mensal</option>
+                        <option value="annual">Anual</option>
+                        <option value="lifetime">Vitalício</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Licenses Table -->
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Email</th>
+                                <th>Plano</th>
+                                <th>Status</th>
+                                <th>Máquinas</th>
+                                <th>Criada em</th>
+                                <th>Expira em</th>
+                                <th style="text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licensesTable">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted" style="padding: 60px;">
+                                    Carregando...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create License Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>➕ Nova Licença</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="createForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="email">Email do Cliente (opcional)</label>
+                        <input type="email" id="email" placeholder="cliente@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="plan">Plano</label>
+                        <select id="plan" required>
+                            <option value="monthly">Mensal (30 dias)</option>
+                            <option value="annual">Anual (365 dias)</option>
+                            <option value="lifetime">Vitalício</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxMachines">Máximo de Máquinas</label>
+                        <input type="number" id="maxMachines" value="2" min="1" max="10" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar Licença</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal (show created key) -->
+    <div class="modal" id="successModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✅ Licença Criada!</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">Sua nova chave de licença:</p>
+                <div
+                    style="background: var(--bg-tertiary); border: 2px dashed var(--primary); border-radius: var(--radius-md); padding: 20px; margin-bottom: 16px;">
+                    <code id="createdKey"
+                        style="font-size: 16px; color: var(--primary-light); word-break: break-all;"></code>
+                </div>
+                <button class="btn btn-primary" onclick="copyKey()">
+                    <span>📋</span> Copiar Key
+                </button>
+                <p style="color: var(--text-muted); font-size: 12px; margin-top: 16px;">
+                    Guarde esta chave! Ela não será exibida novamente.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar Licença</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="editKey" disabled style="opacity: 0.6;">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" placeholder="cliente@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="editMaxMachines">Máximo de Máquinas</label>
+                        <input type="number" id="editMaxMachines" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatus">Status</label>
+                        <select id="editStatus">
+                            <option value="active">Ativo</option>
+                            <option value="expired">Expirado</option>
+                            <option value="revoked">Revogado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="revokeBtn">Revogar</button>
+                    <button type="button" class="btn btn-ghost modal-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        App.requireAuth();
+
+        let allLicenses = [];
+
+        // Setup modals
+        function setupModal(id) {
+            const modal = document.getElementById(id);
+            modal.querySelector('.modal-close').addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-cancel')?.addEventListener('click', () => modal.classList.remove('open'));
+            modal.querySelector('.modal-overlay').addEventListener('click', () => modal.classList.remove('open'));
+        }
+        setupModal('createModal');
+        setupModal('successModal');
+        setupModal('editModal');
+
+        // Open create modal
+        window.openCreateModal = () => {
+            document.getElementById('createForm').reset();
+            document.getElementById('createModal').classList.add('open');
+        };
+
+        // Load licenses
+        async function loadLicenses() {
+            try {
+                const { licenses } = await API.get('/licenses');
+                allLicenses = licenses || [];
+                renderLicenses();
+            } catch (e) {
+                console.error('Error:', e);
+            }
+        }
+
+        // Render licenses table
+        function renderLicenses() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            const plan = document.getElementById('filterPlan').value;
+
+            let filtered = allLicenses.filter(l => {
+                if (search && !l.key.toLowerCase().includes(search) && !(l.email || '').toLowerCase().includes(search)) return false;
+                if (status && l.status !== status) return false;
+                if (plan && l.plan !== plan) return false;
+                return true;
+            });
+
+            const tbody = document.getElementById('licensesTable');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center" style="padding: 60px;">
+                            <div class="empty-state">
+                                <div class="icon">🔑</div>
+                                <h4>Nenhuma licença encontrada</h4>
+                                <p>Crie sua primeira licença clicando no botão acima.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(l => {
+                const planBadge = { monthly: 'badge-monthly', annual: 'badge-annual', lifetime: 'badge-lifetime' }[l.plan];
+                const planText = { monthly: 'Mensal', annual: 'Anual', lifetime: 'Vitalício' }[l.plan];
+                const statusBadge = { active: 'badge-active', expired: 'badge-expired', revoked: 'badge-revoked' }[l.status];
+                const statusText = { active: 'Ativo', expired: 'Expirado', revoked: 'Revogado' }[l.status];
+                const createdAt = new Date(l.created_at).toLocaleDateString('pt-BR');
+                const expiresAt = l.expires_at ? new Date(l.expires_at).toLocaleDateString('pt-BR') : '∞';
+
+                return `
+                    <tr>
+                        <td><code style="font-size: 11px; color: var(--primary-light);">${l.key}</code></td>
+                        <td>${l.email || '<span class="text-muted">-</span>'}</td>
+                        <td><span class="badge ${planBadge}">${planText}</span></td>
+                        <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                        <td>${l.machines_used || 0}/${l.max_machines}</td>
+                        <td>${createdAt}</td>
+                        <td>${expiresAt}</td>
+                        <td style="text-align: right;">
+                            <button class="btn btn-ghost btn-sm" onclick="editLicense(${l.id})">✏️</button>
+                            <button class="btn btn-ghost btn-sm" onclick="resetMachines(${l.id})">🔄</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Create license
+        document.getElementById('createForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const { license } = await API.post('/licenses', {
+                    email: document.getElementById('email').value,
+                    plan: document.getElementById('plan').value,
+                    maxMachines: parseInt(document.getElementById('maxMachines').value)
+                });
+
+                document.getElementById('createModal').classList.remove('open');
+                document.getElementById('createdKey').textContent = license.key;
+                document.getElementById('successModal').classList.add('open');
+                loadLicenses();
+            } catch (e) {
+                App.showToast('Erro ao criar licença', 'error');
+            }
+        });
+
+        // Copy key
+        window.copyKey = () => {
+            const key = document.getElementById('createdKey').textContent;
+            navigator.clipboard.writeText(key);
+            App.showToast('Key copiada!', 'success');
+        };
+
+        // Edit license
+        window.editLicense = (id) => {
+            const license = allLicenses.find(l => l.id === id);
+            if (!license) return;
+
+            document.getElementById('editId').value = id;
+            document.getElementById('editKey').value = license.key;
+            document.getElementById('editEmail').value = license.email || '';
+            document.getElementById('editMaxMachines').value = license.max_machines;
+            document.getElementById('editStatus').value = license.status;
+            document.getElementById('editModal').classList.add('open');
+        };
+
+        // Save edit
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            try {
+                await API.put(`/licenses/${id}`, {
+                    email: document.getElementById('editEmail').value,
+                    maxMachines: parseInt(document.getElementById('editMaxMachines').value),
+                    status: document.getElementById('editStatus').value
+                });
+                document.getElementById('editModal').classList.remove('open');
+                App.showToast('Licença atualizada!', 'success');
+                loadLicenses();
+            } catch (e) {
+                App.showToast('Erro ao atualizar', 'error');
+            }
+        });
+
+        // Revoke
+        document.getElementById('revokeBtn').addEventListener('click', async () => {
+            const id = document.getElementById('editId').value;
+            if (confirm('Revogar esta licença?')) {
+                await API.post(`/licenses/${id}/revoke`);
+                document.getElementById('editModal').classList.remove('open');
+                App.showToast('Licença revogada', 'success');
+                loadLicenses();
+            }
+        });
+
+        // Reset machines
+        window.resetMachines = async (id) => {
+            if (confirm('Resetar máquinas desta licença?')) {
+                await API.post(`/licenses/${id}/reset-machines`);
+                App.showToast('Máquinas resetadas!', 'success');
+                loadLicenses();
+            }
+        };
+
+        // Filters
+        document.getElementById('searchInput').addEventListener('input', renderLicenses);
+        document.getElementById('filterStatus').addEventListener('change', renderLicenses);
+        document.getElementById('filterPlan').addEventListener('change', renderLicenses);
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await API.logout();
+            window.location.href = '/';
+        });
+
+        // Init
+        loadLicenses();
+    </script>
+</body>
+
+</html>

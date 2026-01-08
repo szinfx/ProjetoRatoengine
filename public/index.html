@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RatoEngine - Admin Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="icon">🐀</div>
+                <h1>RatoEngine</h1>
+                <p>Painel Administrativo</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" placeholder="Digite seu usuário" required
+                        autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                </div>
+
+                <div id="loginError" style="color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none;">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <span>Entrar</span>
+                </button>
+            </form>
+
+            <div style="margin-top: 24px; text-align: center;">
+                <p style="font-size: 12px; color: var(--text-muted);">
+                    License & AI Management System
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Check if already logged in
+        API.get('/auth/me').then(data => {
+            if (data.user) {
+                window.location.href = '/dashboard.html';
+            }
+        }).catch(() => { });
+
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>Entrando...</span>';
+            errorEl.style.display = 'none';
+
+            try {
+                const data = await API.login(username, password);
+
+                if (data.success) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    errorEl.textContent = data.error || 'Credenciais inválidas';
+                    errorEl.style.display = 'block';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Erro ao conectar com o servidor';
+                errorEl.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<span>Entrar</span>';
+        });
+    </script>
+</body>
+
+</html>
