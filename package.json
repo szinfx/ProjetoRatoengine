@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "powershell -ExecutionPolicy Bypass -File ../export_server_dist.ps1"
+    "build": "bash ../export_server_dist.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
